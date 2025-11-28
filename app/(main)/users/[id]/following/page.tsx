@@ -23,7 +23,7 @@ export default function FollowingPage() {
         followService.getFollows({ user_id: userId }),
       ]);
       setUser(userData);
-      setFollowing(followsData.results.map((f) => f.aim_user));
+      setFollowing(followsData?.results?.map((f) => f.aim_user) ?? []);
     } catch (error) {
       console.error('Error loading following:', error);
     } finally {
