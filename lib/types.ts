@@ -142,3 +142,28 @@ export interface ErrorResponse {
   non_field_errors?: string[];
   [key: string]: string | string[] | undefined;
 }
+
+/**
+ * 認証レスポンス
+ */
+export interface AuthResponse {
+  token: string;
+  user?: User;
+}
+
+/**
+ * ログインリクエスト
+ */
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+/**
+ * Google認証リクエスト
+ */
+export interface GoogleAuthRequest {
+  id_token: string;
+  email: string;
+  display_name: string;
+}
