@@ -90,3 +90,4 @@ storybook-static/
 
 # Misc
 *.pem
+.vercel
