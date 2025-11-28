@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Avatar } from './ui';
 import type { Post } from '@/lib/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { likeService } from '@/lib/services';
@@ -61,11 +60,7 @@ export function PostCard({ post, onLikeChange }: PostCardProps) {
 
   return (
     <article className="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
-      <div className="flex gap-3">
-        <Link href={`/users/${post.user.user_id}`}>
-          <Avatar name={post.user.user_name} size="md" />
-        </Link>
-        <div className="flex-1 min-w-0">
+      <div>
           <div className="flex items-center gap-2 flex-wrap">
             <Link href={`/users/${post.user.user_id}`} className="font-bold text-gray-900 hover:underline truncate">
               {post.user.user_name}
@@ -108,7 +103,6 @@ export function PostCard({ post, onLikeChange }: PostCardProps) {
               <span>{likeCount}</span>
             </button>
           </div>
-        </div>
       </div>
     </article>
   );

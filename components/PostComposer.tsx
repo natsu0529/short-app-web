@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Avatar, Button, Textarea } from './ui';
+import { Button, Textarea } from './ui';
 import { useAuth } from '@/contexts/AuthContext';
 import { postService } from '@/lib/services';
 import type { Post } from '@/lib/types';
@@ -41,9 +41,7 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
 
   return (
     <div className="p-4 border-b border-gray-200">
-      <div className="flex gap-3">
-        <Avatar name={user.user_name} size="md" />
-        <div className="flex-1">
+      <div>
           <Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -65,7 +63,6 @@ export function PostComposer({ onPostCreated }: PostComposerProps) {
               Post
             </Button>
           </div>
-        </div>
       </div>
     </div>
   );

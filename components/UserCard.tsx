@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Avatar, Button } from './ui';
+import { Button } from './ui';
 import type { User } from '@/lib/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect } from 'react';
@@ -66,9 +66,6 @@ export function UserCard({ user, showStats = true, showFollowButton = true, rank
             {rank}
           </div>
         )}
-        <Link href={`/users/${user.user_id}`}>
-          <Avatar name={user.user_name} size="md" />
-        </Link>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <div className="min-w-0">

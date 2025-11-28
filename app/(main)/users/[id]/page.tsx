@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { Avatar, Button, Tabs, TabPanel, Modal, Input, Textarea } from '@/components/ui';
+import { Button, Tabs, TabPanel, Modal, Input, Textarea } from '@/components/ui';
 import { PostCard, Loading, EmptyState } from '@/components';
 import { useAuth } from '@/contexts/AuthContext';
 import { userService, postService, followService, likeService } from '@/lib/services';
@@ -39,7 +39,7 @@ export default function UserProfilePage() {
         postService.getPosts({ user_id: userId }),
       ]);
       setUser(userData);
-      setPosts(userPosts.results);
+      setPosts(userPosts.results || []);
       setFollowerCount(userData.stats.follower_count);
       setFollowingCount(userData.stats.following_count);
 
@@ -60,7 +60,7 @@ export default function UserProfilePage() {
   const loadLikedPosts = useCallback(async () => {
     try {
       const liked = await likeService.getUserLikedPosts(userId);
-      setLikedPosts(liked.results);
+      setLikedPosts(liked.results || []);
     } catch (error) {
       console.error('Error loading liked posts:', error);
     }
@@ -151,30 +151,25 @@ export default function UserProfilePage() {
   return (
     <div>
       <div className="p-4 border-b border-gray-200">
-        <div className="flex items-start gap-4">
-          <Avatar name={user.user_name} size="xl" />
-          <div className="flex-1">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">{user.user_name}</h1>
-                <p className="text-gray-500">@{user.username}</p>
-              </div>
-              {token && !isOwnProfile && (
-                <Button
-                  variant={isFollowing ? 'outline' : 'primary'}
-                  onClick={handleFollow}
-                  isLoading={isFollowLoading}
-                >
-                  {isFollowing ? 'Unfollow' : 'Follow'}
-                </Button>
-              )}
-              {isOwnProfile && (
-                <Button variant="outline" onClick={handleEditProfile}>
-                  Edit Profile
-                </Button>
-              )}
-            </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">{user.user_name}</h1>
+            <p className="text-gray-500">@{user.username}</p>
           </div>
+          {token && !isOwnProfile && (
+            <Button
+              variant={isFollowing ? 'outline' : 'primary'}
+              onClick={handleFollow}
+              isLoading={isFollowLoading}
+            >
+              {isFollowing ? 'Unfollow' : 'Follow'}
+            </Button>
+          )}
+          {isOwnProfile && (
+            <Button variant="outline" onClick={handleEditProfile}>
+              Edit Profile
+            </Button>
+          )}
         </div>
 
         <div className="mt-3 flex items-center gap-2 flex-wrap">
