@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { PostCard, PostComposer, Loading, EmptyState, Tabs, TabPanel } from '@/components';
+import { PostCard, PostComposer, Loading, EmptyState, Tabs } from '@/components';
 import { useAuth } from '@/contexts/AuthContext';
 import { timelineService } from '@/lib/services';
 import type { Post, TimelineTab } from '@/lib/types';
 
 const tabs = [
   { id: 'latest', label: 'Latest' },
-  { id: 'popular', label: 'Popular' },
   { id: 'following', label: 'Following' },
+  { id: 'popular', label: 'Trending' },
 ];
 
 export default function HomePage() {
@@ -76,6 +76,10 @@ export default function HomePage() {
     );
   };
 
+  const handlePostDelete = (postId: number) => {
+    setPosts((prev) => prev.filter((post) => post.post_id !== postId));
+  };
+
   const filteredTabs = isAuthenticated ? tabs : tabs.filter((tab) => tab.id !== 'following');
 
   return (
@@ -94,7 +98,12 @@ export default function HomePage() {
       ) : (
         <>
           {posts.map((post) => (
-            <PostCard key={post.post_id} post={post} onLikeChange={handleLikeChange} />
+            <PostCard
+              key={post.post_id}
+              post={post}
+              onLikeChange={handleLikeChange}
+              onDelete={handlePostDelete}
+            />
           ))}
           {hasMore && (
             <div className="py-4 flex justify-center">

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import type { User } from '@/lib/types';
-import { authService, getToken, saveToken, removeToken } from '@/lib/auth';
+import { authService, getToken, removeToken } from '@/lib/auth';
 import { userService } from '@/lib/services';
 
 interface AuthContextType {
@@ -10,9 +10,7 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: (idToken: string, email: string, displayName: string) => Promise<void>;
-  register: (data: { username: string; user_name: string; user_mail: string; password: string }) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
   updateUser: (data: { user_name?: string; user_URL?: string; user_bio?: string }) => Promise<void>;
@@ -52,20 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initAuth();
   }, [refreshUser]);
 
-  const login = async (email: string, password: string) => {
-    const result = await authService.login(email, password);
-    setToken(result.token);
-    setUser(result.user);
-  };
-
   const loginWithGoogle = async (idToken: string, email: string, displayName: string) => {
     const result = await authService.googleAuth(idToken, email, displayName);
-    setToken(result.token);
-    setUser(result.user);
-  };
-
-  const register = async (data: { username: string; user_name: string; user_mail: string; password: string }) => {
-    const result = await authService.register(data);
     setToken(result.token);
     setUser(result.user);
   };
@@ -89,9 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         token,
         isLoading,
         isAuthenticated: !!user,
-        login,
         loginWithGoogle,
-        register,
         logout,
         refreshUser,
         updateUser,

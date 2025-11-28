@@ -1,9 +1,9 @@
 /**
- * 認証関連のサービス
+ * 認証関連のサービス（Google認証のみ）
  */
 
 import { api } from './api';
-import type { User, AuthResponse, CreateUserRequest } from './types';
+import type { User, AuthResponse } from './types';
 
 const TOKEN_KEY = 'shortSNS_token';
 
@@ -40,16 +40,6 @@ export function removeToken(): void {
  */
 export const authService = {
   /**
-   * メール/パスワードでログイン
-   */
-  login: async (email: string, password: string): Promise<{ token: string; user: User }> => {
-    const response = await api.post<AuthResponse>('/auth/login/', { email, password });
-    saveToken(response.token);
-    const user = await api.get<User>('/users/me/', { token: response.token });
-    return { token: response.token, user };
-  },
-
-  /**
    * Google認証
    */
   googleAuth: async (idToken: string, email: string, displayName: string): Promise<{ token: string; user: User }> => {
@@ -61,14 +51,6 @@ export const authService = {
     saveToken(response.token);
     const user = await api.get<User>('/users/me/', { token: response.token });
     return { token: response.token, user };
-  },
-
-  /**
-   * ユーザー登録
-   */
-  register: async (data: CreateUserRequest): Promise<{ token: string; user: User }> => {
-    await api.post<User>('/users/', data);
-    return authService.login(data.user_mail, data.password);
   },
 
   /**

@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Button, Input } from '@/components/ui';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   loadGoogleScript,
@@ -17,24 +15,23 @@ const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, loginWithGoogle, isAuthenticated } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { loginWithGoogle, isAuthenticated, isLoading: authLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
   const googleButtonRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!authLoading && isAuthenticated) {
       router.push('/');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, authLoading, router]);
 
   useEffect(() => {
     const setupGoogle = async () => {
       if (!GOOGLE_CLIENT_ID) {
-        console.warn('Google Client ID not configured');
+        console.error('Google Client ID not configured');
+        setError('Google認証の設定が必要です');
         return;
       }
 
@@ -50,51 +47,59 @@ export default function LoginPage() {
             router.push('/');
           } catch (err) {
             console.error('Google login error:', err);
-            setError('Google sign-in failed. Please try again.');
+            setError('ログインに失敗しました。もう一度お試しください。');
           } finally {
             setIsGoogleLoading(false);
           }
         };
 
         initializeGoogleSignIn(GOOGLE_CLIENT_ID, handleGoogleResponse);
+        setIsScriptLoaded(true);
 
         if (googleButtonRef.current) {
-          renderGoogleButton(googleButtonRef.current);
+          renderGoogleButton(googleButtonRef.current, {
+            size: 'large',
+            text: 'continue_with',
+            width: 280,
+          });
         }
       } catch (err) {
         console.error('Failed to setup Google Sign-In:', err);
+        setError('Google認証の読み込みに失敗しました');
       }
     };
 
     setupGoogle();
   }, [loginWithGoogle, router]);
 
+  useEffect(() => {
+    if (isScriptLoaded && googleButtonRef.current) {
+      renderGoogleButton(googleButtonRef.current, {
+        size: 'large',
+        text: 'continue_with',
+        width: 280,
+      });
+    }
+  }, [isScriptLoaded]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="w-8 h-8 border-2 border-gray-300 border-t-black rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   if (isAuthenticated) {
     return null;
   }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsLoading(true);
-
-    try {
-      await login(email, password);
-      router.push('/');
-    } catch (err) {
-      setError('Invalid email or password');
-      console.error('Login error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>
@@ -102,63 +107,23 @@ export default function LoginPage() {
           <p className="text-gray-500 mt-2">Share your thoughts with the world</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            type="email"
-            id="email"
-            label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            required
-          />
-          <Input
-            type="password"
-            id="password"
-            label="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            required
-          />
-
+        <div className="flex flex-col items-center">
           {error && (
-            <p className="text-red-500 text-sm">{error}</p>
+            <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
           )}
 
-          <Button type="submit" className="w-full" size="lg" isLoading={isLoading}>
-            Log in
-          </Button>
-        </form>
+          {isGoogleLoading ? (
+            <div className="h-[44px] flex items-center justify-center">
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-black rounded-full animate-spin" />
+              <span className="ml-2 text-gray-600">ログイン中...</span>
+            </div>
+          ) : (
+            <div ref={googleButtonRef} className="flex justify-center" />
+          )}
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-500">
-            Don&apos;t have an account?{' '}
-            <Link href="/register" className="text-black font-medium hover:underline">
-              Sign up
-            </Link>
+          <p className="mt-6 text-xs text-gray-400 text-center max-w-xs">
+            ログインすることで、利用規約とプライバシーポリシーに同意したものとみなされます。
           </p>
-        </div>
-
-        <div className="mt-8">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">Or continue with</span>
-            </div>
-          </div>
-
-          <div className="mt-4 flex justify-center">
-            {isGoogleLoading ? (
-              <div className="h-[44px] flex items-center justify-center">
-                <div className="w-6 h-6 border-2 border-gray-300 border-t-black rounded-full animate-spin" />
-              </div>
-            ) : (
-              <div ref={googleButtonRef} />
-            )}
-          </div>
         </div>
       </div>
     </div>

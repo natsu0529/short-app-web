@@ -5,18 +5,23 @@ import Link from 'next/link';
 import { Avatar } from './ui';
 import type { Post } from '@/lib/types';
 import { useAuth } from '@/contexts/AuthContext';
-import { likeService } from '@/lib/services';
+import { likeService, postService } from '@/lib/services';
 
 interface PostCardProps {
   post: Post;
   onLikeChange?: (postId: number, isLiked: boolean, likeCount: number) => void;
+  onDelete?: (postId: number) => void;
 }
 
-export function PostCard({ post, onLikeChange }: PostCardProps) {
+export function PostCard({ post, onLikeChange, onDelete }: PostCardProps) {
   const { user: currentUser, token } = useAuth();
   const [isLiked, setIsLiked] = useState(post.is_liked);
   const [likeCount, setLikeCount] = useState(post.like_count);
   const [isLiking, setIsLiking] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isOwnPost = currentUser?.user_id === post.user.user_id;
 
   const formatTime = (timeString: string) => {
     const date = new Date(timeString);
@@ -59,6 +64,27 @@ export function PostCard({ post, onLikeChange }: PostCardProps) {
     }
   };
 
+  const handleDelete = async () => {
+    if (!token || isDeleting) return;
+
+    if (!confirm('この投稿を削除しますか？')) {
+      setShowMenu(false);
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await postService.deletePost(post.post_id, token);
+      onDelete?.(post.post_id);
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      alert('投稿の削除に失敗しました');
+    } finally {
+      setIsDeleting(false);
+      setShowMenu(false);
+    }
+  };
+
   return (
     <article className="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
       <div className="flex gap-3">
@@ -79,6 +105,34 @@ export function PostCard({ post, onLikeChange }: PostCardProps) {
               <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
                 Lv.{post.user.user_level}
               </span>
+            )}
+            {isOwnPost && (
+              <div className="relative ml-auto">
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="6" r="1.5" />
+                    <circle cx="12" cy="12" r="1.5" />
+                    <circle cx="12" cy="18" r="1.5" />
+                  </svg>
+                </button>
+                {showMenu && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+                    <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+                      <button
+                        onClick={handleDelete}
+                        disabled={isDeleting}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 disabled:opacity-50"
+                      >
+                        {isDeleting ? '削除中...' : '削除'}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
           </div>
           <p className="mt-1 text-gray-900 whitespace-pre-wrap break-words">{post.context}</p>

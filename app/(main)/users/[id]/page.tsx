@@ -128,6 +128,15 @@ export default function UserProfilePage() {
         post.post_id === postId ? { ...post, is_liked: isLiked, like_count: likeCount } : post
       )
     );
+    setLikedPosts((prev) =>
+      prev.map((post) =>
+        post.post_id === postId ? { ...post, is_liked: isLiked, like_count: likeCount } : post
+      )
+    );
+  };
+
+  const handlePostDelete = (postId: number) => {
+    setPosts((prev) => prev.filter((post) => post.post_id !== postId));
   };
 
   if (isLoading) {
@@ -219,7 +228,12 @@ export default function UserProfilePage() {
           <EmptyState title="No posts yet" description={isOwnProfile ? "Share your first post!" : "This user hasn't posted anything yet."} />
         ) : (
           posts.map((post) => (
-            <PostCard key={post.post_id} post={post} onLikeChange={handleLikeChange} />
+            <PostCard
+              key={post.post_id}
+              post={post}
+              onLikeChange={handleLikeChange}
+              onDelete={handlePostDelete}
+            />
           ))
         )}
       </TabPanel>
