@@ -135,10 +135,6 @@ export default function UserProfilePage() {
     );
   };
 
-  const handlePostDelete = (postId: number) => {
-    setPosts((prev) => prev.filter((post) => post.post_id !== postId));
-  };
-
   if (isLoading) {
     return <Loading className="py-12" />;
   }
@@ -232,7 +228,6 @@ export default function UserProfilePage() {
               key={post.post_id}
               post={post}
               onLikeChange={handleLikeChange}
-              onDelete={handlePostDelete}
             />
           ))
         )}

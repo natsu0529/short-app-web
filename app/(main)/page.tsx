@@ -76,10 +76,6 @@ export default function HomePage() {
     );
   };
 
-  const handlePostDelete = (postId: number) => {
-    setPosts((prev) => prev.filter((post) => post.post_id !== postId));
-  };
-
   const filteredTabs = isAuthenticated ? tabs : tabs.filter((tab) => tab.id !== 'following');
 
   return (
@@ -102,7 +98,6 @@ export default function HomePage() {
               key={post.post_id}
               post={post}
               onLikeChange={handleLikeChange}
-              onDelete={handlePostDelete}
             />
           ))}
           {hasMore && (
