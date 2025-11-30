@@ -45,7 +45,7 @@ export default function UserProfilePage() {
 
       if (currentUser && token && !isOwnProfile) {
         const follows = await followService.getFollows({ user_id: currentUser.user_id, aim_user_id: userId });
-        if (follows.results.length > 0) {
+        if (follows?.results?.length > 0) {
           setIsFollowing(true);
           setFollowId(follows.results[0].id);
         }

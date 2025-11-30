@@ -27,7 +27,7 @@ export function UserCard({ user, showStats = true, showFollowButton = true, rank
       if (!currentUser || !token || isOwnProfile) return;
       try {
         const follows = await followService.getFollows({ user_id: currentUser.user_id, aim_user_id: user.user_id });
-        if (follows.results.length > 0) {
+        if (follows?.results?.length > 0) {
           setIsFollowing(true);
           setFollowId(follows.results[0].id);
         }

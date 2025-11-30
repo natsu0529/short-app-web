@@ -39,7 +39,7 @@ export function PostCard({ post, onLikeChange }: PostCardProps) {
     try {
       if (isLiked) {
         const likes = await likeService.getLikes({ user_id: currentUser?.user_id, post_id: post.post_id });
-        if (likes.results.length > 0) {
+        if (likes?.results?.length > 0) {
           await likeService.deleteLike(likes.results[0].id, token);
           setIsLiked(false);
           setLikeCount((prev) => prev - 1);
