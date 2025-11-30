@@ -174,13 +174,26 @@ export default function UserProfilePage() {
           )}
         </div>
 
-        <div className="mt-3 flex items-center gap-2 flex-wrap">
-          <span className="text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded">
-            Lv.{user.user_level}
-          </span>
-          <span className="text-sm text-gray-500">
-            {user.stats.experience_points} EXP
-          </span>
+        <div className="mt-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded">
+              Lv.{user.user_level}
+            </span>
+            {isOwnProfile && (
+              <span className="text-sm text-gray-500">
+                {user.stats.experience_points} EXP
+              </span>
+            )}
+          </div>
+          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-black h-2 rounded-full transition-all"
+              style={{ width: `${(user.stats.experience_points % 100)}%` }}
+            />
+          </div>
+          <p className="text-xs text-gray-400 mt-1">
+            {isOwnProfile ? `Next level: ${100 - (user.stats.experience_points % 100)} EXP` : `Progress to Lv.${user.user_level + 1}`}
+          </p>
         </div>
 
         {user.user_bio && (
