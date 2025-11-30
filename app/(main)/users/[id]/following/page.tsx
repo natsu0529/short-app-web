@@ -23,7 +23,9 @@ export default function FollowingPage() {
         followService.getFollows({ user_id: userId }),
       ]);
       setUser(userData);
-      setFollowing(followsData?.results?.map((f) => f.aim_user) ?? []);
+      // APIが配列を直接返す場合と、PaginatedResponseを返す場合の両方に対応
+      const followsList = Array.isArray(followsData) ? followsData : followsData?.results ?? [];
+      setFollowing(followsList.map((f: { aim_user: User }) => f.aim_user).filter(Boolean));
     } catch (error) {
       console.error('Error loading following:', error);
     } finally {
