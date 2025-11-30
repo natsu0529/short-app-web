@@ -72,16 +72,11 @@ export function UserCard({ user, showStats = true, showFollowButton = true, rank
               <Link href={`/users/${user.user_id}`} className="font-bold text-gray-900 hover:underline truncate block">
                 {user.user_name}
               </Link>
-              <div className="flex items-center gap-2 flex-wrap">
-                <Link href={`/users/${user.user_id}`} className="text-gray-500 text-sm truncate">
-                  @{user.username}
-                </Link>
-                {user.user_level > 0 && (
-                  <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
-                    Lv.{user.user_level}
-                  </span>
-                )}
-              </div>
+              {user.user_level > 0 && (
+                <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                  Lv.{user.user_level}
+                </span>
+              )}
             </div>
             {showFollowButton && token && !isOwnProfile && (
               <Button

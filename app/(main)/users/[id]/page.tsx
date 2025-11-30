@@ -154,7 +154,9 @@ export default function UserProfilePage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">{user.user_name}</h1>
-            <p className="text-gray-500">@{user.username}</p>
+            {isOwnProfile && (
+              <p className="text-gray-500">@{user.username}</p>
+            )}
           </div>
           {token && !isOwnProfile && (
             <Button

@@ -65,9 +65,6 @@ export function PostCard({ post, onLikeChange }: PostCardProps) {
             <Link href={`/users/${post.user.user_id}`} className="font-bold text-gray-900 hover:underline truncate">
               {post.user.user_name}
             </Link>
-            <Link href={`/users/${post.user.user_id}`} className="text-gray-500 text-sm truncate">
-              @{post.user.username}
-            </Link>
             <span className="text-gray-400 text-sm">·</span>
             <span className="text-gray-500 text-sm">{formatTime(post.time)}</span>
             {post.user.user_level > 0 && (
