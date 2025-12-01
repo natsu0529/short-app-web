@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Input, Tabs, TabPanel } from '@/components/ui';
 import { PostCard, UserCard, Loading, EmptyState } from '@/components';
 import { searchService } from '@/lib/services';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Post, User } from '@/lib/types';
 
 const tabs = [
@@ -12,6 +13,7 @@ const tabs = [
 ];
 
 export default function SearchPage() {
+  const { token } = useAuth();
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState<User[]>([]);
@@ -32,7 +34,7 @@ export default function SearchPage() {
     try {
       const [usersData, postsData] = await Promise.all([
         searchService.searchUsers(query),
-        searchService.searchPosts(query),
+        searchService.searchPosts(query, undefined, token || undefined),
       ]);
       setUsers(usersData.results);
       setPosts(postsData.results);
@@ -41,7 +43,7 @@ export default function SearchPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [query]);
+  }, [query, token]);
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {

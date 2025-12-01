@@ -36,7 +36,7 @@ export default function UserProfilePage() {
     try {
       const [userData, userPosts] = await Promise.all([
         userService.getUser(userId),
-        postService.getPosts({ user_id: userId }),
+        postService.getPosts({ user_id: userId }, token || undefined),
       ]);
       setUser(userData);
       setPosts(userPosts.results || []);
@@ -59,12 +59,12 @@ export default function UserProfilePage() {
 
   const loadLikedPosts = useCallback(async () => {
     try {
-      const liked = await likeService.getUserLikedPosts(userId);
+      const liked = await likeService.getUserLikedPosts(userId, undefined, token || undefined);
       setLikedPosts(liked.results || []);
     } catch (error) {
       console.error('Error loading liked posts:', error);
     }
-  }, [userId]);
+  }, [userId, token]);
 
   useEffect(() => {
     loadUserData();

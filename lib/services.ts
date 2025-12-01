@@ -64,8 +64,11 @@ export const postService = {
   /**
    * 投稿一覧を取得
    */
-  getPosts: (params?: { user_id?: number; page?: number; page_size?: number }) =>
-    api.get<PaginatedResponse<Post>>(`/posts/?${new URLSearchParams(params as Record<string, string>).toString()}`),
+  getPosts: (params?: { user_id?: number; page?: number; page_size?: number }, token?: string) =>
+    api.get<PaginatedResponse<Post>>(
+      `/posts/?${new URLSearchParams(params as Record<string, string>).toString()}`,
+      token ? { token } : undefined
+    ),
 
   /**
    * 投稿詳細を取得
@@ -147,9 +150,10 @@ export const likeService = {
   /**
    * ユーザーがいいねした投稿一覧
    */
-  getUserLikedPosts: (userId: number, params?: { page?: number; page_size?: number }) =>
+  getUserLikedPosts: (userId: number, params?: { page?: number; page_size?: number }, token?: string) =>
     api.get<PaginatedResponse<Post>>(
-      `/users/${userId}/liked-posts/?${new URLSearchParams(params as Record<string, string>).toString()}`
+      `/users/${userId}/liked-posts/?${new URLSearchParams(params as Record<string, string>).toString()}`,
+      token ? { token } : undefined
     ),
 };
 
@@ -182,9 +186,10 @@ export const searchService = {
   /**
    * 投稿を検索
    */
-  searchPosts: (query: string, params?: { page?: number; page_size?: number }) =>
+  searchPosts: (query: string, params?: { page?: number; page_size?: number }, token?: string) =>
     api.get<PaginatedResponse<Post>>(
-      `/search/posts/?q=${encodeURIComponent(query)}&${new URLSearchParams(params as Record<string, string>).toString()}`
+      `/search/posts/?q=${encodeURIComponent(query)}&${new URLSearchParams(params as Record<string, string>).toString()}`,
+      token ? { token } : undefined
     ),
 };
 
@@ -195,9 +200,10 @@ export const rankingService = {
   /**
    * 投稿いいねランキング
    */
-  getPostLikesRanking: (params?: { range?: RankingRange; page?: number; page_size?: number }) =>
+  getPostLikesRanking: (params?: { range?: RankingRange; page?: number; page_size?: number }, token?: string) =>
     api.get<PaginatedResponse<Post>>(
-      `/rankings/posts/likes/?${new URLSearchParams(params as Record<string, string>).toString()}`
+      `/rankings/posts/likes/?${new URLSearchParams(params as Record<string, string>).toString()}`,
+      token ? { token } : undefined
     ),
 
   /**

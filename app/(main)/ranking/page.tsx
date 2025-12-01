@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Tabs, TabPanel } from '@/components/ui';
 import { PostCard, UserCard, Loading, EmptyState } from '@/components';
 import { rankingService } from '@/lib/services';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Post, User, RankingRange } from '@/lib/types';
 
 const tabs = [
@@ -14,6 +15,7 @@ const tabs = [
 ];
 
 export default function RankingPage() {
+  const { token } = useAuth();
   const [activeTab, setActiveTab] = useState('posts');
   const [range, setRange] = useState<RankingRange>('24h');
   const [posts, setPosts] = useState<Post[]>([]);
@@ -27,7 +29,7 @@ export default function RankingPage() {
     try {
       switch (tab) {
         case 'posts': {
-          const data = await rankingService.getPostLikesRanking({ range });
+          const data = await rankingService.getPostLikesRanking({ range }, token || undefined);
           setPosts(data.results);
           break;
         }
@@ -52,7 +54,7 @@ export default function RankingPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [range]);
+  }, [range, token]);
 
   useEffect(() => {
     loadRanking(activeTab);
