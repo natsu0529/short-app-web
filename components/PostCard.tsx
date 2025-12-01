@@ -35,26 +35,33 @@ export function PostCard({ post, onLikeChange }: PostCardProps) {
   const handleLike = async () => {
     if (!token || isLiking) return;
 
+    const wasLiked = isLiked;
+    const prevCount = likeCount;
+
+    // Optimistic UI: 即座にUIを更新
     setIsLiking(true);
+    setIsLiked(!wasLiked);
+    setLikeCount(wasLiked ? prevCount - 1 : prevCount + 1);
+    onLikeChange?.(post.post_id, !wasLiked, wasLiked ? prevCount - 1 : prevCount + 1);
+
     try {
-      if (isLiked) {
+      if (wasLiked) {
+        // いいね解除
         const likesResponse = await likeService.getLikes({ user_id: currentUser?.user_id, post_id: post.post_id });
-        // Handle both paginated and array response formats
         const likes = Array.isArray(likesResponse) ? likesResponse : likesResponse?.results;
         if (likes?.length > 0) {
           await likeService.deleteLike(likes[0].id, token);
-          setIsLiked(false);
-          setLikeCount((prev) => prev - 1);
-          onLikeChange?.(post.post_id, false, likeCount - 1);
         }
       } else {
+        // いいね追加
         await likeService.createLike({ post_id: post.post_id }, token);
-        setIsLiked(true);
-        setLikeCount((prev) => prev + 1);
-        onLikeChange?.(post.post_id, true, likeCount + 1);
       }
     } catch (error) {
+      // 失敗したら元に戻す
       console.error('Error toggling like:', error);
+      setIsLiked(wasLiked);
+      setLikeCount(prevCount);
+      onLikeChange?.(post.post_id, wasLiked, prevCount);
     } finally {
       setIsLiking(false);
     }
