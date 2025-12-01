@@ -38,9 +38,11 @@ export function PostCard({ post, onLikeChange }: PostCardProps) {
     setIsLiking(true);
     try {
       if (isLiked) {
-        const likes = await likeService.getLikes({ user_id: currentUser?.user_id, post_id: post.post_id });
-        if (likes?.results?.length > 0) {
-          await likeService.deleteLike(likes.results[0].id, token);
+        const likesResponse = await likeService.getLikes({ user_id: currentUser?.user_id, post_id: post.post_id });
+        // Handle both paginated and array response formats
+        const likes = Array.isArray(likesResponse) ? likesResponse : likesResponse?.results;
+        if (likes?.length > 0) {
+          await likeService.deleteLike(likes[0].id, token);
           setIsLiked(false);
           setLikeCount((prev) => prev - 1);
           onLikeChange?.(post.post_id, false, likeCount - 1);
